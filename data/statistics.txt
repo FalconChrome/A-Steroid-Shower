@@ -1,0 +1,3 @@
+deaths = 42 45 16
+bestlevel = 13
+highscores = 5481 4928 4334 3796 3236
