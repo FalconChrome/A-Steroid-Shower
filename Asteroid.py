@@ -4,6 +4,8 @@ from random import randint
 from itertools import product
 from time import time
 
+ARROWS = (pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT)
+
 
 class Quit(KeyboardInterrupt):
     """Исключение для завершения работы"""
@@ -440,19 +442,19 @@ class TableSet:
 
     def move_focuse(self, d):
         i, b = self.focused
-        if d == 0:  # Вверх K_UP = 273
+        if d == 0:  # Вверх K_UP
             if b == 0:
                 i = (i - 1) % self.size
                 b = self.sizes[i] - 1
             else:
                 b -= 1
-        elif d == 1:  # Вниз K_DOWN = 274
+        elif d == 1:  # Вниз K_DOWN
             if self.sizes[i] == b + 1:
                 i = (i + 1) % self.size
                 b = 0
             else:
                 b += 1
-        elif d == 2:  # Вправо K_RIGHT = 275
+        elif d == 2:  # Вправо K_RIGHT
             rows = self.tables[i].rows
             new = b + rows - self.sizes[i]
             if new >= 0:
@@ -461,7 +463,7 @@ class TableSet:
             else:
                 self.focused = (i, self.tables[i].move_focuse(rows))
                 return rows
-        elif d == 3:  # Влево K_LEFT = 276
+        elif d == 3:  # Влево K_LEFT
             rows = self.tables[i].rows
             new = b - rows
             if new < 0:
@@ -588,11 +590,14 @@ class Settings:
     def run(self):
         running = True
         while running:
+            arrow_pressed = [False, False, False, False]
             for event in pygame.event.get():
                 if self.events(event):
                     running = False
-            arrow_pressed = pygame.key.get_pressed()[pygame.K_UP:
-                                                     pygame.K_LEFT + 1]
+                if event.type == pygame.KEYDOWN:
+                    if event.key in ARROWS:
+                        arrow_pressed[ARROWS.index(event.key)] = True
+
             self.buttons.update(mouse.get_pos(), arrow_pressed)
             if self.buttons.focused[0] == 2 and any(arrow_pressed):
                 self.bgmus_vol(self.buttons[2].get_val())
@@ -756,11 +761,14 @@ class Statistics:
     def run(self):
         running = True
         while running:
+            arrow_pressed = [False, False, False, False, ]
             for event in pygame.event.get():
                 if self.events(event):
                     running = False
-            arrow_pressed = pygame.key.get_pressed()[pygame.K_UP:
-                                                     pygame.K_LEFT + 1]
+                if event.type == pygame.KEYDOWN:
+                    if event.key in ARROWS:
+                        arrow_pressed[ARROWS.index(event.key)] = True
+                        
             self.buttons.update(mouse.get_pos(), arrow_pressed)
             self.render()
             clock.tick(self.fps)
@@ -1100,6 +1108,7 @@ class Game:
     FONT_NAME = os.path.join('data', 'mr_AfronikG.ttf')
     WHITE = pygame.color.Color('white')
     LEVEL_H = 1600
+    ARROWS = (pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT)
 
     def set_params(self):
         size = tuple(int(x) for x in setter.get('size').split('x'))
@@ -1176,11 +1185,13 @@ class Game:
         bgmus_play()
         self.START_TIME = time() % (60 * 60 * 24 * 30)
         while running:
+            arrow_pressed = [False, False, False, False, ]
             for event in pygame.event.get():
                 self.events(event)
-
-            arrow_pressed = pygame.key.get_pressed()[pygame.K_UP:
-                                                     pygame.K_LEFT + 1]
+                if event.type == pygame.KEYDOWN:
+                    if event.key in ARROWS:
+                        arrow_pressed[ARROWS.index(event.key)] = True
+            
             self.all_sprites.update()
             self.player_group.update(arrow_pressed)
             self.asteroids.update()
