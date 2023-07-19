@@ -1089,15 +1089,15 @@ class Asteroids:
 
     def calculate_velocity_rate(self, level):
         x = level
-        a = 0.3
-        b = 20
-        if level < 100:
-            return x ** 0.7 + 0.2 * 2 ** (a * ((x / 10) + b)) - 0.21 * 2 ** (a * ((x // 10) + b))
+        a = 0.33
+        b = 14
+        if level < 50:
+            return x ** 0.6 + 0.16 * 2 ** (a * ((x / 5) + b)) - 0.19 * 2 ** (a * ((x // 5) + b))
         else:
             return (x - 50) ** 0.9
 
     def level_up(self, level):
-        self.n = int(level ** 0.6 * self.game.width / 250)
+        self.n = int((level ** 0.6 - (2.5 * level // 10) ** 0.5) * self.game.width / 250)
         self.t0 = self.game.fps / (2 * level ** 0.7)
         self.v = self.calculate_velocity_rate(level) * 80 / self.game.fps
 
@@ -1258,7 +1258,7 @@ class Game:
                         display.toggle_fullscreen()
             clock.tick(self.fps)
         end_time = time() % (60 * 60 * 24 * 30)
-        self.START_TIME -= end_time - start_time
+        self.START_TIME += end_time - start_time
 
     def levelup(self):
         self.level += 1
