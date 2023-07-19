@@ -1087,10 +1087,19 @@ class Asteroids:
             self.i = 0
             self.gen_particle()
 
+    def calculate_velocity_rate(self, level):
+        x = level
+        a = 0.3
+        b = 20
+        if level < 100:
+            return x ** 0.7 + 0.2 * 2 ** (a * ((x / 10) + b)) - 0.21 * 2 ** (a * ((x // 10) + b))
+        else:
+            return (x - 50) ** 0.9
+
     def level_up(self, level):
         self.n = int(level ** 0.6 * self.game.width / 250)
         self.t0 = self.game.fps / (2 * level ** 0.7)
-        self.v = (level ** 0.9) * 80 / self.game.fps
+        self.v = self.calculate_velocity_rate(level) * 80 / self.game.fps
 
 
 class Game:  
