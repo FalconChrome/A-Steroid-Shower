@@ -589,14 +589,17 @@ class Settings:
 
     def run(self):
         running = True
+        arrow_pressed = [False, False, False, False]  # Up, Down, Right, Left
         while running:
-            arrow_pressed = [False, False, False, False]
             for event in pygame.event.get():
                 if self.events(event):
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key in ARROWS:
-                        arrow_pressed[ARROWS.index(event.key)] = True
+                        arrow_pressed[ARROWS.index(event.key)] = True  
+                if event.type == pygame.KEYUP:
+                    if event.key in ARROWS:
+                        arrow_pressed[ARROWS.index(event.key)] = False
 
             self.buttons.update(mouse.get_pos(), arrow_pressed)
             if self.buttons.focused[0] == 2 and any(arrow_pressed):
@@ -760,14 +763,17 @@ class Statistics:
 
     def run(self):
         running = True
+        arrow_pressed = [False, False, False, False]  # Up, Down, Right, Left
         while running:
-            arrow_pressed = [False, False, False, False, ]
             for event in pygame.event.get():
                 if self.events(event):
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key in ARROWS:
-                        arrow_pressed[ARROWS.index(event.key)] = True
+                        arrow_pressed[ARROWS.index(event.key)] = True  
+                if event.type == pygame.KEYUP:
+                    if event.key in ARROWS:
+                        arrow_pressed[ARROWS.index(event.key)] = False
                         
             self.buttons.update(mouse.get_pos(), arrow_pressed)
             self.render()
@@ -916,7 +922,7 @@ class Rocket(pygame.sprite.Sprite):
         self.rotate(0)
         if not args:
             return None
-        if type(args[0]) == tuple:
+        if type(args[0]) == list:
             self.drive(args[0])
         self.fuel = max(0, self.fuel - self.fuel_loss)
 
@@ -1184,13 +1190,17 @@ class Game:
         running = True
         bgmus_play()
         self.START_TIME = time() % (60 * 60 * 24 * 30)
+        arrow_pressed = [False, False, False, False]  # Up, Down, Right, Left
         while running:
-            arrow_pressed = [False, False, False, False, ]
             for event in pygame.event.get():
                 self.events(event)
                 if event.type == pygame.KEYDOWN:
                     if event.key in ARROWS:
-                        arrow_pressed[ARROWS.index(event.key)] = True
+                        arrow_pressed[ARROWS.index(event.key)] = True  
+                if event.type == pygame.KEYUP:
+                    if event.key in ARROWS:
+                        arrow_pressed[ARROWS.index(event.key)] = False
+            
             
             self.all_sprites.update()
             self.player_group.update(arrow_pressed)
@@ -1270,7 +1280,7 @@ class Game:
                     f"Средняя скорость продвижения: {score[2]}",
                     f"Счёт: {str(score[3])}",
                     " ",
-                    "Нажмите любую клавишу для выхода"]
+                    "Нажмите дважды любую клавишу для выхода"]
         self.fon.blit()
         text_coord = list(end_coord)
         text_coord[0] += 10
@@ -1278,8 +1288,8 @@ class Game:
         for line in end_text:
             text_coord[1] += 10 + render_text(self.screen, line,
                                               text_coord, self.BIG_FONT)
-        waiting = True
-        while waiting:
+        waiting = 2
+        while waiting > 0:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     raise Quit
@@ -1288,10 +1298,10 @@ class Game:
                                      pygame.K_RSUPER):
                         display.toggle_fullscreen()
                     else:
-                        waiting = False
+                        waiting -= 1
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if sum(mouse.get_pressed()) >= 1:
-                        waiting = False
+                        waiting = 0
                     else:
                         display.toggle_fullscreen()
             display.flip()
@@ -1303,7 +1313,7 @@ if __name__ == "__main__":
         pygame.init()
         setter = SettingsFile()
         music = pygame.mixer.music
-        music.set_volume(1)
+        music.set_volume(0.72)
         clock = pygame.time.Clock()
         display = pygame.display
         mouse = pygame.mouse
